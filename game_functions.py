@@ -8,7 +8,7 @@ def create_body(screen, ai_settings, bodies):
 	bodies.add(new_body)
 
 def create_initial_snake(screen, ai_settings, image_source, bodies, head):
-	for i in range(4):
+	for i in range(10):
 		new_body = Body(screen, ai_settings, image_source, i + 2)
 		new_body.rect.x = head.rect.x - ai_settings.unit * (i + 1)
 		new_body.rect.y = head.rect.y
@@ -21,32 +21,32 @@ def update_body(bodies):
 	''' update the location of snake body'''
 	bodies.update()
 
-def check_events(head):
+def check_events(ai_settings):
 	'''monitor user key or mouse input'''
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
-			check_key_down_event(event, head)
+			check_key_down_event(event, ai_settings)
 
-def check_key_down_event(event, head):
+def check_key_down_event(event, ai_settings):
 	''' determine action based on player keyboard input
 	up = 1, right = 2, down = 3, left = 4'''
 	if event.key == pygame.K_LEFT:
-		head.movement = 4
+		ai_settings.movement = 4
 	elif event.key == pygame.K_RIGHT:
-		head.movement = 2
+		ai_settings.movement = 2
 	elif event.key == pygame.K_UP:
-		head.movement = 1
+		ai_settings.movement = 1
 	elif event.key == pygame.K_DOWN:
-		head.movement = 3
+		ai_settings.movement = 3
 	elif event.key == pygame.K_q:
 		# press 'q' to quit game
 		sys.exit()
 
 def set_fps(clock):
 	''' sake speed will be controlled by frame rate'''
-	clock.tick(4)
+	clock.tick(5)
 
 def update_screen(bodies, ai_settings, screen, head):
 	''' draw elements onto the screen'''

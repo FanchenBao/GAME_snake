@@ -19,10 +19,9 @@ class Body(Sprite):
 		self.rect.x = 0
 		self.rect.y = 0
 
-		# flags for moving the body
-		self.movement = 0
 		# record the previous moving direction of snake before initiation of next movement
-		self.dir = 0
+		# default starting dir = 2 (snake going to the right at beginning)
+		self.dir = 2
 
 		# record the list of position where change of direction on head takes place
 		self.pos_change = []
@@ -31,13 +30,33 @@ class Body(Sprite):
 
 	def update(self):
 		'''update current position of the body, movement occurs at the increment of each unit'''
-		# when snake is already moving (thus having a dir already)
-		if self.dir:
-			# change body direction
-			self.change_body_position()
-		# move snake from a motionless position (at the beginning of game)
-		else:
-			self.move(self.movement)
+		# body does not move until AFTER initial keyboard input
+		if self.ai_settings.movement:
+			# body position change happens ONLY after head has changed
+			if self.dir_change:
+				# if head change is going up or down (from a previous horizontal dir)
+				if self.dir_change[0] in [1, 3]:
+					# record body's current x 
+					current_location = self.rect.x
+				# if head change is going left or right (from a previous vertical dir)
+				if self.dir_change[0] in [2, 4]:
+					# record body's current y
+					current_location = self.rect.y
+
+				# compare the body's current x or y to the corresponding x or y when head changes
+				if current_location == self.pos_change[0]:
+					# changes to vertical
+					if self.dir_change[0] in [1, 3]:
+						self.image = self.image_source.body_image_v.copy()
+					# changes to horizontal
+					if self.dir_change[0] in [2, 4]:
+						self.image = self.image_source.body_image_h.copy()
+					# body's new direction is the same as head's new direction
+					self.dir = self.dir_change[0]
+					# delete the head's direction and its corresponding change position to prepare for next change
+					del self.dir_change[0]
+					del self.pos_change[0]
+			self.move(self.dir)	
 
 	def move(self, direction):
 		''' move the snake along the screen (grid)'''
@@ -65,34 +84,6 @@ class Body(Sprite):
 			if self.rect.top < self.screen_rect.top:
 				self.rect.y = self.screen_rect.bottom
 			self.dir = 1
-
-	def change_body_position(self):
-		''' change body position and move in new direction'''
-		# body position change happens ONLY after head has changed
-		if self.dir_change:
-			# if head change is going up or down (from a previous horizontal dir)
-			if self.dir_change[0] in [1, 3]:
-				# record body's current x 
-				current_location = self.rect.x
-			# if head change is going left or right (from a previous vertical dir)
-			if self.dir_change[0] in [2, 4]:
-				# record body's current y
-				current_location = self.rect.y
-
-			# compare the body's current x or y to the corresponding x or y when head changes
-			if current_location == self.pos_change[0]:
-				# changes to vertical
-				if self.dir_change[0] in [1, 3]:
-					self.image = self.image_source.body_image_v.copy()
-				# changes to horizontal
-				if self.dir_change[0] in [2, 4]:
-					self.image = self.image_source.body_image_h.copy()
-				# body's new direction is the same as head's new direction
-				self.dir = self.dir_change[0]
-				# delete the head's direction and its corresponding change position to prepare for next change
-				del self.dir_change[0]
-				del self.pos_change[0]
-		self.move(self.dir)
 
 
 	# def draw(self):

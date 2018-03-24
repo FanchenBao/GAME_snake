@@ -25,7 +25,7 @@ def run_game():
 
 	# main game loop
 	while True:
-		gf.check_events(head)
+		gf.check_events(ai_settings)
 
 		gf.update_head(head)
 		gf.update_body(bodies)

@@ -19,23 +19,21 @@ class Head(Sprite):
 		self.rect.x = self.ai_settings.x_axis[int(self.ai_settings.x_ticks / 2 - 1)]
 		self.rect.y = self.ai_settings.y_axis[int(self.ai_settings.y_ticks / 2 - 1)]
 
-		# flags for moving the head
-		self.movement = 0
-
 		# record the previous moving direction of snake before initiation of next movement
-		self.dir = 0
+		# since the default starting position has the head facing right, default dir = 2
+		self.dir = 2
 
 	def update(self):
-		'''update current position of the body, movement occurs at the increment of each unit'''
-		# when snake is already moving (thus having a dir already)
-		if self.dir:
-			# change head direction
-			self.change_head_position()
-		# move snake from a motionless position (at the beginning of game)
-		else:
-			for body in self.bodies.sprites():
-				body.movement = self.movement
-			self.move(self.movement)
+		''' change head position and move in the new direction'''
+		# head does not move until AFTER initial keyboard input
+		if self.ai_settings.movement:
+			# if head's current direction is the same or opposite to new direction input, do not change course
+			if abs(self.ai_settings.movement - self.dir) in [0, 2]:
+				self.move(self.dir)
+			# only change course when current direction is perpendicular to new input
+			else:
+				self.update_head()
+		
 
 	def move(self, direction):
 		''' move the snake along the screen (grid)'''
@@ -67,39 +65,30 @@ class Head(Sprite):
 	def update_head(self):
 		''' Update head image to represent rotation without losing pixel,
 		also record the direction and location of such change, as reference for the body to follow.'''
-		if self.movement == 1:
+		if self.ai_settings.movement == 1:
 			# record head x coordinate
 			for body in self.bodies.sprites():
 				body.pos_change.append(self.rect.x)
 			self.image = self.image_source.head_image_u.copy()
-		if self.movement == 3:
+		if self.ai_settings.movement == 3:
 			# record head x coordinate
 			for body in self.bodies.sprites():
 				body.pos_change.append(self.rect.x)
 			self.image = self.image_source.head_image_d.copy()
-		if self.movement == 4:
+		if self.ai_settings.movement == 4:
 			# record head y coordinate
 			for body in self.bodies.sprites():
 				body.pos_change.append(self.rect.y)
 			self.image = self.image_source.head_image_l.copy()
-		if self.movement == 2:
+		if self.ai_settings.movement == 2:
 			# record head y coordinate
 			for body in self.bodies.sprites():
 				body.pos_change.append(self.rect.y)
 			self.image = self.image_source.head_image_r.copy()
 		# record the direction of change
 		for body in self.bodies.sprites():
-			body.dir_change.append(self.movement)
-		self.move(self.movement)
-
-	def change_head_position(self):
-		''' change head position and move in the new direction'''
-		# if head's current direction is the same or opposite to new direction input, do not change course
-		if abs(self.movement - self.dir) in [0, 2]:
-			self.move(self.dir)
-		# only change course when current direction is perpendicular to new input
-		else:
-			self.update_head()
+			body.dir_change.append(self.ai_settings.movement)
+		self.move(self.ai_settings.movement)
 
 	def blitme(self):
 		self.screen.blit(self.image, self.rect)

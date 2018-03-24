@@ -15,3 +15,6 @@ class Settings():
 		# create a grid with given x and y coordinates on the axis
 		self.x_axis = tuple(range(0, self.screen_width, self.unit))
 		self.y_axis = tuple(range(0, self.screen_height, self.unit))
+
+		# flag, recording snake head's new movement from keyboard input
+		self.movement = 0
