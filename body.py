@@ -20,8 +20,7 @@ class Body(Sprite):
 		self.rect.y = 0
 
 		# record the previous moving direction of snake before initiation of next movement
-		# default starting dir = 2 (snake going to the right at beginning)
-		self.dir = 2
+		self.dir = 0
 
 		# record the list of position where change of direction on head takes place
 		self.pos_change = []

@@ -2,8 +2,8 @@ class Settings():
 	''' store game settings'''
 	def __init__(self):
 		# screen size
-		self.screen_width = 740
-		self.screen_height = 740
+		self.screen_width = 400
+		self.screen_height = 400
 		# background color
 		self.background_color = (34,139,34)
 
