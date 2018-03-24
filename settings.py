@@ -15,6 +15,3 @@ class Settings():
 		# create a grid with given x and y coordinates on the axis
 		self.x_axis = tuple(range(0, self.screen_width, self.unit))
 		self.y_axis = tuple(range(0, self.screen_height, self.unit))
-
-		# record the position where change of directiont takes place
-		self.pos_change = 0
