@@ -13,20 +13,22 @@ class Head(Sprite):
 		self.bodies = bodies
 		
 		self.reset()
-		self.rect = self.image.get_rect()
-		# self.rect = pygame.Rect(0, 0, 20, 20)
-		# self.color = (0, 0, 0)
-		self.rect.x = self.ai_settings.x_axis[int(self.ai_settings.x_ticks / 2 - 1)]
-		self.rect.y = self.ai_settings.y_axis[int(self.ai_settings.y_ticks / 2 - 1)]
+		
 
 	def reset(self):
 		''' reset initial parameters for head'''
 		self.image = self.image_source.head_image_r.copy()
+		self.rect = self.image.get_rect()
 		# record the previous moving direction of snake before initiation of next movement
 		# since the default starting position has the head facing right, default dir = 2
 		self.dir = 2
 		# flag to record whether snake has died
 		self.dead = False
+		# flag to record whether snake head is outside screen
+		self.out_of_bound = False
+		# put head at the middle of screen at the beginning of game
+		self.rect.x = self.ai_settings.x_axis[int(self.ai_settings.x_ticks / 2 - 1)]
+		self.rect.y = self.ai_settings.y_axis[int(self.ai_settings.y_ticks / 2 - 1)]
 
 	def update(self):
 		''' change head position and move in the new direction'''
@@ -47,24 +49,36 @@ class Head(Sprite):
 			# allow the body to reappear at the opposite side of screen
 			if self.rect.left < self.screen_rect.left:
 				self.rect.x = self.screen_rect.right
+				self.out_of_bound = True
+			else:
+				self.out_of_bound = False
 			self.dir = 4
 		if direction == 2:
 			self.rect.x += self.ai_settings.unit
 			# allow the body to reappear at the opposite side of screen
 			if self.rect.right > self.screen_rect.right:
 				self.rect.x = self.screen_rect.left
+				self.out_of_bound = True
+			else:
+				self.out_of_bound = False
 			self.dir = 2
 		if direction == 3:
 			self.rect.y += self.ai_settings.unit
 			# allow the body to reappear at the opposite side of screen
 			if self.rect.bottom > self.screen_rect.bottom:
 				self.rect.y = self.screen_rect.top
+				self.out_of_bound = True
+			else:
+				self.out_of_bound = False
 			self.dir = 3
 		if direction == 1:
 			self.rect.y -= self.ai_settings.unit
 			# allow the body to reappear at the opposite side of screen
 			if self.rect.top < self.screen_rect.top:
 				self.rect.y = self.screen_rect.bottom
+				self.out_of_bound = True
+			else:
+				self.out_of_bound = False
 			self.dir = 1
 
 	def update_head(self):

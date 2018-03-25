@@ -11,36 +11,36 @@ def create_initial_snake(screen, ai_settings, image_source, bodies, head):
 	new_body.dir = 2
 	bodies.add(new_body)
 
-def create_extra_body(extra_bodies, bodies, head, screen, ai_settings, image_source):
+def create_food(foods, bodies, head, screen, ai_settings, image_source):
 	''' create an extra body for snake to eat'''
-	extra_body = Body(screen, ai_settings, image_source, (len(bodies) + 1))
+	new_food = Body(screen, ai_settings, image_source, (len(bodies) + 1), True)
 	# locate the extra body anywhere on the screen except where the snake is
 	while True:
 		# flag to detect whether the extra body overlaps with the snake
 		overlap = False
 		# extra body position is random
-		extra_body.rect.x = ai_settings.x_axis[randint(0, ai_settings.x_ticks - 1)]
-		extra_body.rect.y = ai_settings.y_axis[randint(0, ai_settings.y_ticks - 1)]
+		new_food.rect.x = ai_settings.x_axis[randint(0, ai_settings.x_ticks - 1)]
+		new_food.rect.y = ai_settings.y_axis[randint(0, ai_settings.y_ticks - 1)]
 		# check overlap with head
-		if head.rect.x == extra_body.rect.x and head.rect.y == extra_body.rect.y:
+		if head.rect.x == new_food.rect.x and head.rect.y == new_food.rect.y:
 			continue
 		else:
 			# check overlap with body
 			for body in bodies.sprites():
-				if body.rect.x == extra_body.rect.x and body.rect.y == extra_body.rect.y:
+				if body.rect.x == new_food.rect.x and body.rect.y == new_food.rect.y:
 					overlap = True
 					break
 			if overlap:
 				continue
 			# when no overlap occurs, include the extra body in game
 			else:
-				extra_bodies.add(extra_body)
+				foods.add(new_food)
 				return
 
-def update_head(head, extra_bodies, bodies, screen, ai_settings, image_source, stats):
+def update_head(head, foods, bodies, screen, ai_settings, image_source, stats):
 	''' update current head position, consider the situation where head eats an extra body, or head bumps into its own body, or head bumps into obstacle'''
 	head.update()
-	eaten_body = pygame.sprite.spritecollideany(head, extra_bodies)
+	eaten_body = pygame.sprite.spritecollideany(head, foods)
 	eat_self = pygame.sprite.spritecollideany(head, bodies)
 	# detect whether head collides with own body
 	if eat_self:
@@ -52,7 +52,7 @@ def update_head(head, extra_bodies, bodies, screen, ai_settings, image_source, s
 	# detect whether head collide with extra body
 	if eaten_body:
 		# collide happens, remove extra body from extra bodies group
-		extra_bodies.remove(eaten_body)
+		foods.remove(eaten_body)
 		for body in bodies.sprites():
 			# find the last body of snake
 			if body.index == len(bodies):
@@ -69,13 +69,25 @@ def update_head(head, extra_bodies, bodies, screen, ai_settings, image_source, s
 					eaten_body.rect.x = body.rect.x - ai_settings.unit
 				# add eaten body to the bodies group (snake gets longer)
 				bodies.add(eaten_body)
-				# update score
-				stats.score += ai_settings.point
+				# update score, and keep all scores int
+				stats.score += int(ai_settings.point)
 				if stats.score > stats.high_score:
 					stats.high_score = stats.score
 
+				if len(bodies) >= (ai_settings.threshold * stats.level + 1):
+					level_up(ai_settings, stats)
+
 				# create a new extra body
-				create_extra_body(extra_bodies, bodies, head, screen, ai_settings, image_source)
+				create_food(foods, bodies, head, screen, ai_settings, image_source)
+
+def level_up(ai_settings, stats):
+	''' scale up game settings to increase difficulty'''
+	# player earns more point when leveling up
+	ai_settings.point *= ai_settings.scale
+	# set fps to int
+	ai_settings.fps += 1
+	
+	stats.level += 1
 
 def copy_parameters(new_body, old_body):
 	''' copy key parameters to new body from old body'''
@@ -90,64 +102,66 @@ def update_body(bodies):
 	''' update the location of snake body'''
 	bodies.update()
 
-def check_events(screen, ai_settings, image_source, bodies, head, extra_bodies, stats, filename):
+def check_events(screen, ai_settings, image_source, bodies, head, foods, stats, filename):
 	'''monitor user key or mouse input'''
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
-			check_key_down_event(event, screen, ai_settings, image_source, bodies, head, extra_bodies, stats, filename)
+			check_key_down_event(event, screen, ai_settings, image_source, bodies, head, foods, stats, filename)
 
-def check_key_down_event(event, screen, ai_settings, image_source, bodies, head, extra_bodies, stats, filename):
+def check_key_down_event(event, screen, ai_settings, image_source, bodies, head, foods, stats, filename):
 	''' determine action based on player keyboard input
 	up = 1, right = 2, down = 3, left = 4'''
-	if event.key == pygame.K_LEFT:
-		ai_settings.movement = 4
-	elif event.key == pygame.K_RIGHT:
-		ai_settings.movement = 2
-	elif event.key == pygame.K_UP:
-		ai_settings.movement = 1
-	elif event.key == pygame.K_DOWN:
-		ai_settings.movement = 3
-	elif event.key == pygame.K_q:
+	if event.key == pygame.K_q:
 		# press 'q' to quit game
 		save_high_score(filename, stats)
 		sys.exit()
 	elif event.key == pygame.K_p:
 		# press 'p' to start game
 		ai_settings.game_active = True
-		restart_game(screen, ai_settings, image_source, bodies, head, extra_bodies, stats)
+		restart_game(screen, ai_settings, image_source, bodies, head, foods, stats)
+	
+	if not head.out_of_bound:
+		if event.key == pygame.K_LEFT:
+			ai_settings.movement = 4
+		elif event.key == pygame.K_RIGHT:
+			ai_settings.movement = 2
+		elif event.key == pygame.K_UP:
+			ai_settings.movement = 1
+		elif event.key == pygame.K_DOWN:
+			ai_settings.movement = 3
 
 def save_high_score(filename, stats):
 	with open(filename, 'w') as file_object:
 		file_object.write(str(stats.high_score))
 
-def set_fps(clock):
+def set_fps(clock, ai_settings):
 	''' sake speed will be controlled by frame rate'''
-	clock.tick(5)
+	clock.tick(ai_settings.fps)
 
-def restart_game(screen, ai_settings, image_source, bodies, head, extra_bodies, stats):
+def restart_game(screen, ai_settings, image_source, bodies, head, foods, stats):
 	''' reset settings and stats when game starts'''
 	ai_settings.reset()
 	stats.reset_stats()
 	head.reset()
-	# empty bodies and extra_bodies
+	# empty bodies and foods
 	bodies.empty()
-	extra_bodies.empty()
+	foods.empty()
 
 	# create the initial snake
 	create_initial_snake(screen, ai_settings, image_source, bodies, head)
 	# create the inital extra body
-	create_extra_body(extra_bodies, bodies, head, screen, ai_settings, image_source)
+	create_food(foods, bodies, head, screen, ai_settings, image_source)
 
 def create_msgs(msgs, stats):
 	msg1 = 'Press "P" to Play'
 	msg2 = 'Press "Q" to Quit'
 	msg3 = 'Game Over'
 	msg4 = 'Your Score: '
-	msg5 = str(stats.score)
+	msg5 = "{:,}".format(round(stats.score), -1)
 	msg6 = 'High Score: '
-	msg7 = str(stats.high_score)
+	msg7 = "{:,}".format(round(stats.high_score, -1))
 	msgs.append(msg1)
 	msgs.append(msg2)
 	msgs.append(msg3)
@@ -157,10 +171,10 @@ def create_msgs(msgs, stats):
 	msgs.append(msg7)
 
 def update_msgs(msgs, stats):
-	msgs[4] = str(stats.score)
-	msgs[6] = str(stats.high_score)
+	msgs[4] = "{:,}".format(round(stats.score), -1)
+	msgs[6] = "{:,}".format(round(stats.high_score), -1)
 
-def update_screen(bodies, extra_bodies, ai_settings, screen, head, button):
+def update_screen(bodies, foods, ai_settings, screen, head, button):
 	''' draw elements onto the screen'''
 	screen.fill(ai_settings.background_color)
 	# draw snake head
@@ -168,7 +182,7 @@ def update_screen(bodies, extra_bodies, ai_settings, screen, head, button):
 	# draw snake body
 	bodies.draw(screen)
 	# draw extra bodies to be eaten
-	extra_bodies.draw(screen)
+	foods.draw(screen)
 
 	if not ai_settings.game_active:
 		button.draw_button()

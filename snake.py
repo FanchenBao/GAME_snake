@@ -21,7 +21,7 @@ def run_game():
 	# the bodies already attached to the head
 	bodies = Group()
 	# the bodies NOT attached to the snake and to be eaten by the snake
-	extra_bodies = Group()
+	foods = Group()
 	# generate a head
 	head = Head(screen, ai_settings, image_source, bodies)
 	# record game statistics
@@ -36,19 +36,19 @@ def run_game():
 
 	# main game loop
 	while True:
-		gf.check_events(screen, ai_settings, image_source, bodies, head, extra_bodies, stats, filename)
+		gf.check_events(screen, ai_settings, image_source, bodies, head, foods, stats, filename)
 
 		if ai_settings.game_active:
-			gf.update_head(head, extra_bodies, bodies, screen, ai_settings, image_source, stats)
+			gf.update_head(head, foods, bodies, screen, ai_settings, image_source, stats)
 			gf.update_body(bodies)
 			gf.update_msgs(msgs, stats)
-			gf.set_fps(clock)
+			gf.set_fps(clock, ai_settings)
 		
 		else:
 			if head.dead:
 				button = Button(screen, ai_settings, msgs, True)
 			else:
 				button = Button(screen, ai_settings, msgs, False)
-		gf.update_screen(bodies, extra_bodies, ai_settings, screen, head, button)
+		gf.update_screen(bodies, foods, ai_settings, screen, head, button)
 
 run_game()

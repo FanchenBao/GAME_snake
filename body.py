@@ -2,7 +2,7 @@ import pygame
 from pygame.sprite import Sprite
 
 class Body(Sprite):
-	def __init__(self, screen, ai_settings, image_source, index):
+	def __init__(self, screen, ai_settings, image_source, index, is_food = False):
 		super().__init__()
 		''' initiate a class representing each body segment of the snake'''
 		self.screen = screen
@@ -11,8 +11,13 @@ class Body(Sprite):
 		self.screen_rect = self.screen.get_rect()
 
 		self.index = index
+
+		self.is_food = is_food
 		
-		self.image = self.image_source.body_image_h.copy()
+		if self.is_food:
+			self.image = pygame.image.load('images/food.bmp')
+		else:
+			self.image = self.image_source.body_image_h.copy()
 		self.rect = self.image.get_rect()
 		# self.rect = pygame.Rect(0, 0, 20, 20)
 		# self.color = (0, 0, 0)

@@ -9,6 +9,8 @@ class GameStats():
 	def reset_stats(self):
 		# record current score
 		self.score = 0
+		# record level (not shown to player)
+		self.level = 1
 
 	def read_high_score(self):
 		# read high score
