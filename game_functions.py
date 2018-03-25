@@ -37,10 +37,18 @@ def create_extra_body(extra_bodies, bodies, head, screen, ai_settings, image_sou
 				extra_bodies.add(extra_body)
 				return
 
-def update_head(head, extra_bodies, bodies, screen, ai_settings, image_source):
+def update_head(head, extra_bodies, bodies, screen, ai_settings, image_source, stats):
 	''' update current head position, consider the situation where head eats an extra body, or head bumps into its own body, or head bumps into obstacle'''
 	head.update()
 	eaten_body = pygame.sprite.spritecollideany(head, extra_bodies)
+	eat_self = pygame.sprite.spritecollideany(head, bodies)
+	# detect whether head collides with own body
+	if eat_self:
+		# collide happens, game over
+		head.dead = True
+		ai_settings.game_active = False
+		return
+
 	# detect whether head collide with extra body
 	if eaten_body:
 		# collide happens, remove extra body from extra bodies group
@@ -61,9 +69,11 @@ def update_head(head, extra_bodies, bodies, screen, ai_settings, image_source):
 					eaten_body.rect.x = body.rect.x - ai_settings.unit
 				# add eaten body to the bodies group (snake gets longer)
 				bodies.add(eaten_body)
+				# update score
+				stats.score += ai_settings.point
+
 				# create a new extra body
 				create_extra_body(extra_bodies, bodies, head, screen, ai_settings, image_source)
-				return
 
 def copy_parameters(new_body, old_body):
 	''' copy key parameters to new body from old body'''
@@ -78,15 +88,15 @@ def update_body(bodies):
 	''' update the location of snake body'''
 	bodies.update()
 
-def check_events(ai_settings):
+def check_events(screen, ai_settings, image_source, bodies, head, extra_bodies, stats):
 	'''monitor user key or mouse input'''
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
-			check_key_down_event(event, ai_settings)
+			check_key_down_event(event, screen, ai_settings, image_source, bodies, head, extra_bodies, stats)
 
-def check_key_down_event(event, ai_settings):
+def check_key_down_event(event, screen, ai_settings, image_source, bodies, head, extra_bodies, stats):
 	''' determine action based on player keyboard input
 	up = 1, right = 2, down = 3, left = 4'''
 	if event.key == pygame.K_LEFT:
@@ -100,12 +110,50 @@ def check_key_down_event(event, ai_settings):
 	elif event.key == pygame.K_q:
 		# press 'q' to quit game
 		sys.exit()
+	elif event.key == pygame.K_p:
+		# press 'p' to start game
+		ai_settings.game_active = True
+		restart_game(screen, ai_settings, image_source, bodies, head, extra_bodies, stats)
 
 def set_fps(clock):
 	''' sake speed will be controlled by frame rate'''
 	clock.tick(5)
 
-def update_screen(bodies, extra_bodies, ai_settings, screen, head):
+def restart_game(screen, ai_settings, image_source, bodies, head, extra_bodies, stats):
+	''' reset settings and stats when game starts'''
+	ai_settings.reset()
+	stats.reset_stats()
+	head.reset()
+	# empty bodies and extra_bodies
+	bodies.empty()
+	extra_bodies.empty()
+
+	# create the initial snake
+	create_initial_snake(screen, ai_settings, image_source, bodies, head)
+	# create the inital extra body
+	create_extra_body(extra_bodies, bodies, head, screen, ai_settings, image_source)
+
+def create_msgs(msgs, stats):
+	msg1 = 'Press "P" to Play'
+	msg2 = 'Press "Q" to Quit'
+	msg3 = 'Game Over'
+	msg4 = 'Your Score: '
+	msg5 = str(stats.score)
+	msg6 = 'High Score: '
+	msg7 = str(stats.high_score)
+	msgs.append(msg1)
+	msgs.append(msg2)
+	msgs.append(msg3)
+	msgs.append(msg4)
+	msgs.append(msg5)
+	msgs.append(msg6)
+	msgs.append(msg7)
+
+def update_msgs(msgs, stats):
+	msgs[4] = str(stats.score)
+	msgs[6] = str(stats.high_score)
+
+def update_screen(bodies, extra_bodies, ai_settings, screen, head, button):
 	''' draw elements onto the screen'''
 	screen.fill(ai_settings.background_color)
 	# draw snake head
@@ -114,8 +162,9 @@ def update_screen(bodies, extra_bodies, ai_settings, screen, head):
 	bodies.draw(screen)
 	# draw extra bodies to be eaten
 	extra_bodies.draw(screen)
-	# for body in bodies.sprites():
-	# 	body.draw()
+
+	if not ai_settings.game_active:
+		button.draw_button()
 
 	# display the most recently drawn screen
 	pygame.display.flip()

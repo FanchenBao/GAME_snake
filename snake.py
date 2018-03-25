@@ -3,6 +3,8 @@ from pygame.sprite import Group
 from settings import Settings
 from image_source import ImageSource
 from head import Head
+from button import Button
+from game_stats import GameStats
 import game_functions as gf
 from pygame import time
 
@@ -22,23 +24,30 @@ def run_game():
 	extra_bodies = Group()
 	# generate a head
 	head = Head(screen, ai_settings, image_source, bodies)
-	
-	# create the initial snake
-	gf.create_initial_snake(screen, ai_settings, image_source, bodies, head)
-	# create the inital extra body
-	gf.create_extra_body(extra_bodies, bodies, head, screen, ai_settings, image_source)
+	# record game statistics
+	stats = GameStats()
+	# record a list of messages that will be shown at the beginning and end of game
+	msgs = []
+	gf.create_msgs(msgs, stats)
+
 	# use clock to control fps
 	clock = time.Clock()
 
 	# main game loop
 	while True:
-		gf.check_events(ai_settings)
+		gf.check_events(screen, ai_settings, image_source, bodies, head, extra_bodies, stats)
 
-		gf.update_head(head, extra_bodies, bodies, screen, ai_settings, image_source)
-		gf.update_body(bodies)
-
-		gf.update_screen(bodies, extra_bodies, ai_settings, screen, head)
-
-		gf.set_fps(clock)
+		if ai_settings.game_active:
+			gf.update_head(head, extra_bodies, bodies, screen, ai_settings, image_source, stats)
+			gf.update_body(bodies)
+			gf.update_msgs(msgs, stats)
+			gf.set_fps(clock)
+		
+		else:
+			if head.dead:
+				button = Button(screen, ai_settings, msgs, True)
+			else:
+				button = Button(screen, ai_settings, msgs, False)
+		gf.update_screen(bodies, extra_bodies, ai_settings, screen, head, button)
 
 run_game()

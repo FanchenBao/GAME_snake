@@ -12,16 +12,21 @@ class Head(Sprite):
 
 		self.bodies = bodies
 		
-		self.image = self.image_source.head_image_r.copy()
+		self.reset()
 		self.rect = self.image.get_rect()
 		# self.rect = pygame.Rect(0, 0, 20, 20)
 		# self.color = (0, 0, 0)
 		self.rect.x = self.ai_settings.x_axis[int(self.ai_settings.x_ticks / 2 - 1)]
 		self.rect.y = self.ai_settings.y_axis[int(self.ai_settings.y_ticks / 2 - 1)]
 
+	def reset(self):
+		''' reset initial parameters for head'''
+		self.image = self.image_source.head_image_r.copy()
 		# record the previous moving direction of snake before initiation of next movement
 		# since the default starting position has the head facing right, default dir = 2
 		self.dir = 2
+		# flag to record whether snake has died
+		self.dead = False
 
 	def update(self):
 		''' change head position and move in the new direction'''
