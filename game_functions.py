@@ -98,10 +98,6 @@ def copy_parameters(new_body, old_body):
 	new_body.pos_change = old_body.pos_change.copy()
 	new_body.dir_change = old_body.dir_change.copy()
 
-def update_body(bodies):
-	''' update the location of snake body'''
-	bodies.update()
-
 def check_events(screen, ai_settings, image_source, bodies, head, foods, stats, filename):
 	'''monitor user key or mouse input'''
 	for event in pygame.event.get():
@@ -135,10 +131,6 @@ def check_key_down_event(event, screen, ai_settings, image_source, bodies, head,
 def save_high_score(filename, stats):
 	with open(filename, 'w') as file_object:
 		file_object.write(str(stats.high_score))
-
-def set_fps(clock, ai_settings):
-	''' sake speed will be controlled by frame rate'''
-	clock.tick(ai_settings.fps)
 
 def restart_game(screen, ai_settings, image_source, bodies, head, foods, stats):
 	''' reset settings and stats when game starts'''

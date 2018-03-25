@@ -40,14 +40,19 @@ def run_game():
 
 		if ai_settings.game_active:
 			gf.update_head(head, foods, bodies, screen, ai_settings, image_source, stats)
-			gf.update_body(bodies)
+			# update the location of snake body
+			bodies.update()
+			# update msgs that will show when game ends
 			gf.update_msgs(msgs, stats)
-			gf.set_fps(clock, ai_settings)
+			# snake speed will be controlled by frame rate
+			clock.tick(ai_settings.fps)
 		
 		else:
 			if head.dead:
+				# show msg when game ends
 				button = Button(screen, ai_settings, msgs, True)
 			else:
+				# show msg before game starts
 				button = Button(screen, ai_settings, msgs, False)
 		gf.update_screen(bodies, foods, ai_settings, screen, head, button)
 
