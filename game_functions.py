@@ -71,6 +71,8 @@ def update_head(head, extra_bodies, bodies, screen, ai_settings, image_source, s
 				bodies.add(eaten_body)
 				# update score
 				stats.score += ai_settings.point
+				if stats.score > stats.high_score:
+					stats.high_score = stats.score
 
 				# create a new extra body
 				create_extra_body(extra_bodies, bodies, head, screen, ai_settings, image_source)
@@ -88,15 +90,15 @@ def update_body(bodies):
 	''' update the location of snake body'''
 	bodies.update()
 
-def check_events(screen, ai_settings, image_source, bodies, head, extra_bodies, stats):
+def check_events(screen, ai_settings, image_source, bodies, head, extra_bodies, stats, filename):
 	'''monitor user key or mouse input'''
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
-			check_key_down_event(event, screen, ai_settings, image_source, bodies, head, extra_bodies, stats)
+			check_key_down_event(event, screen, ai_settings, image_source, bodies, head, extra_bodies, stats, filename)
 
-def check_key_down_event(event, screen, ai_settings, image_source, bodies, head, extra_bodies, stats):
+def check_key_down_event(event, screen, ai_settings, image_source, bodies, head, extra_bodies, stats, filename):
 	''' determine action based on player keyboard input
 	up = 1, right = 2, down = 3, left = 4'''
 	if event.key == pygame.K_LEFT:
@@ -109,11 +111,16 @@ def check_key_down_event(event, screen, ai_settings, image_source, bodies, head,
 		ai_settings.movement = 3
 	elif event.key == pygame.K_q:
 		# press 'q' to quit game
+		save_high_score(filename, stats)
 		sys.exit()
 	elif event.key == pygame.K_p:
 		# press 'p' to start game
 		ai_settings.game_active = True
 		restart_game(screen, ai_settings, image_source, bodies, head, extra_bodies, stats)
+
+def save_high_score(filename, stats):
+	with open(filename, 'w') as file_object:
+		file_object.write(str(stats.high_score))
 
 def set_fps(clock):
 	''' sake speed will be controlled by frame rate'''

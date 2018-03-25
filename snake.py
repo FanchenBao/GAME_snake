@@ -25,7 +25,8 @@ def run_game():
 	# generate a head
 	head = Head(screen, ai_settings, image_source, bodies)
 	# record game statistics
-	stats = GameStats()
+	filename = 'high_score.txt'
+	stats = GameStats(filename)
 	# record a list of messages that will be shown at the beginning and end of game
 	msgs = []
 	gf.create_msgs(msgs, stats)
@@ -35,7 +36,7 @@ def run_game():
 
 	# main game loop
 	while True:
-		gf.check_events(screen, ai_settings, image_source, bodies, head, extra_bodies, stats)
+		gf.check_events(screen, ai_settings, image_source, bodies, head, extra_bodies, stats, filename)
 
 		if ai_settings.game_active:
 			gf.update_head(head, extra_bodies, bodies, screen, ai_settings, image_source, stats)

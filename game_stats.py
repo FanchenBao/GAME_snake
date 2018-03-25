@@ -1,6 +1,8 @@
 class GameStats():
 	''' track game statistics'''
-	def __init__(self):
+	def __init__(self, filename):
+		self.filename = filename
+
 		self.reset_stats()
 		self.read_high_score()
 	
@@ -10,4 +12,6 @@ class GameStats():
 
 	def read_high_score(self):
 		# read high score
-		self.high_score = 0
+		with open(self.filename) as file_object:
+			content = file_object.read()
+		self.high_score = int(content)
