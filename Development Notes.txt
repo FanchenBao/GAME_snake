@@ -1,0 +1,12 @@
+Notes:
+
+3/22/2018
+* Not using the rotate function of pygame due to loss of pixel. Since my game setting requires each body segment to be exact in accordance to the grid, any loss of pixel (due to repeated rotation) could cause significant problem as the game progresses longer. Will solve this problem by creating a separate class with all images, then in the Body class, just copy those images whenever a rotation is needed.
+
+3/23/2018
+* Must separate head and body in two classes. Each body must have its own list of dir_change and pos_change, corresponding to the direction and x or y coordinate of head change. Each body must update its own list of dir_change and pos_change. A global list stored in ai_settings does NOT work when there are more than 1 body part.
+
+3/25/2018
+* New bug found: if snake is out of the screen and a direction input happens BEFORE snake head reappears on the other side of the screen, then snake would disappear off the screen. This is most likely due to the program allowing direction input while the head is still outside the screen. A new flag is introduced to Head to avoid keyboard input while snake¡¯s head is out of bound.
+
+* Game complete (there are a few more ideas that I think might make the game better. e.g. continuously increasing the snake speed will make the game unplayable at the end, since human reaction can only be so fast. So another way to increase difficulty could be setting a maximum speed where the snake can travel. Once such speed is reached as leveling up, the next level would be to create obstacles on the screen. Then the snake has to eat food while evading obstacles. The maximum speed could be the one most playable, as too slow or too fast both make maneuver difficult. But to implement this idea, I need to set up a new obstacle class and tweak how it can randomly show up on the screen without initially overlapping with snake and food. This is not difficult but quite time-consuming, which means it is not on my priority now. So not gonna fulfill that idea.)
