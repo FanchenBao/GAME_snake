@@ -1,3 +1,11 @@
+'''
+Author: Fanchen Bao
+Date: 03/24/2018
+
+Description:
+Button class, for message display
+'''
+
 import pygame
 import pygame.font
 

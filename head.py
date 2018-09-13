@@ -1,3 +1,11 @@
+'''
+Author: Fanchen Bao
+Date: 03/20/2018
+
+Description:
+Head class, for snake's head
+'''
+
 import pygame
 from pygame.sprite import Sprite
 

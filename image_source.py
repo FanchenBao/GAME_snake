@@ -1,3 +1,12 @@
+'''
+Author: Fanchen Bao
+Date: 03/22/2018
+
+Description:
+Since rotating images in pygame with the image quality I can provide has poor performance, the turning of snake's face is achieved by loading the corresponding face image.
+ImageSource class serves this purpose.
+'''
+
 import pygame
 
 class ImageSource():

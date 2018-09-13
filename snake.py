@@ -1,3 +1,12 @@
+'''
+Author: Fanchen Bao
+Date: 03/20/2018
+
+Description:
+Driver file
+The widely known game of snake.
+'''
+
 import pygame
 from pygame.sprite import Group
 from settings import Settings

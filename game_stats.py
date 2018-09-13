@@ -1,3 +1,11 @@
+'''
+Author: Fanchen Bao
+Date: 03/24/2018
+
+Description:
+GameStats class
+'''
+
 class GameStats():
 	''' track game statistics'''
 	def __init__(self, filename):

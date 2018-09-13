@@ -1,3 +1,11 @@
+'''
+Author: Fanchen Bao
+Date: 03/20/2018
+
+Description:
+Settings class, default settings
+'''
+
 class Settings():
 	''' store game settings'''
 	def __init__(self):

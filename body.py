@@ -1,3 +1,13 @@
+'''
+Author: Fanchen Bao
+Date: 03/20/2018
+
+Description:
+Body class, body of the snake. Pay attention to how body changes its movement direction contingent on how the head has been moving.
+Since head can change direction multiple times while the body is still traveling in one direction, 
+it is necessary to record the direction each time head makes a turn and where the turn is made, so that all bodies can follow suit.
+'''
+
 import pygame
 from pygame.sprite import Sprite
 
